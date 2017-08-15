@@ -34,8 +34,9 @@ int main()
 
   PID pid;
   pid.Init(0.485079,0.000359376,4.9994);
+  bool twiddle_active = false;
 
-  h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+  h.onMessage([&pid, &twiddle_active](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -55,7 +56,9 @@ int main()
           pid.UpdateError(cte);
           steer_value = pid.TotalError();
 
-          // pid.Twiddle(cte, 1000, ws);
+          if (twiddle_active) {
+            pid.Twiddle(cte, 1000, ws);
+          }
 
           if (steer_value > 1)
           {
