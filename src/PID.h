@@ -1,3 +1,7 @@
+#include <uWS/uWS.h>
+#include <iostream>
+#include <vector>
+
 #ifndef PID_H
 #define PID_H
 
@@ -16,11 +20,21 @@ public:
   double Kp;
   double Ki;
   double Kd;
-  // for storing previous value of CTE
-  double prev_cte;
 
   /*
-  * Constructor
+  * Helpers
+  */
+  bool is_initialized;
+  bool first_flag;
+  bool second_flag;
+  int steps;
+  double best_error;
+  double avg_error;
+  double total_error;
+  int coefficient;
+  std::vector<double> dp;
+  /*
+  * Constructors
   */
   PID();
 
@@ -43,6 +57,16 @@ public:
   * Calculate the total PID error.
   */
   double TotalError();
+
+  /*
+  * Reset PID values and simulator.
+  */
+  void Reset(uWS::WebSocket<uWS::SERVER> ws);
+
+  /*
+  * Twiddle algorithm
+  */
+  void Twiddle(double cte, int max_steps, uWS::WebSocket<uWS::SERVER> ws);
 };
 
 #endif /* PID_H */
